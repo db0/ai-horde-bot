@@ -29,6 +29,9 @@
             "message": "OMG! you got {{amount}} kudos from {{user_mention}} just from [this message]({{message_url}})!"
         }
     },
+    "horde": {
+        "baseUrl": "https://koboldai.net/api/v2"
+    },
     "defaultMessage": "{{user_mention}} has given you {{amount}} kudos.",
     "useEmojiNames": true,
     "clientId": "1019572037360025650"
