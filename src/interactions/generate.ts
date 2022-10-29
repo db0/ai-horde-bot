@@ -22,8 +22,6 @@ const styles: Record<string, (s: string) => string> = {
         `Old found footage of hyper realistic ${p}, abandoned, liminal space, horror, eerie, mysterious, noise and grain, dark hues, dark tones, single source of light, 35mm, Kodak Autochrome, floating particles, auto flash, auto focus`,
     witch_land: (p) =>
         `digital art of ${p}, witch world, Halloween theme, scenic Halloween, highly detailed, zbrush, by artist Artgerm, by artist Stephen Hickman, by artist Carne griffiths`,
-    spooky: (p) =>
-        `${p} creepy hyperrealistic detailed horror fantasy concept art, by Wayne Barlowe, by Zdzislaw Beksinski, by Seb McKinnon`,
     nightmare_fairytale: (p) =>
         `horror ${p} in a dark forest, darkness, fog, very detailed, cold, Editorial illustration, gothic, evil, art by Sam Bosma, painting by H.P. Lovecraft`,
     elmstreet: (p) =>
