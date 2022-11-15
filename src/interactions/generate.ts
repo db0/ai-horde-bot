@@ -30,7 +30,8 @@ const styles: Record<string, (s: string) => string> = {
     flat: (p) =>
         `${p} ui art icon by victo ngai, kilian eng, lois van baarle, flat`,
     butter: (p) =>
-        `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,    // terror_ink: (p) =>
+        `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,
+    // terror_ink: (p) =>
     //     `a terrifying ink drawing of a ${p}, by Ko Young Hoon, by Yoshitaka Amano, Charcoal Art, Ink, Oil Paint, Concept Art, Color Grading, Dramatic, Intentional camera movement, Lonely, Cracks, With Imperfections, in a symbolic and meaningful style, insanely detailed and intricate, hypermaximalist, elegant, ornate, hyper realistic, super detailed, a ghost, covered in spiderweb, eerie, feeling of dread, decay, samhain`,
     // nightmare: (p) =>
     //     `${p} by Aaron Horkey, by Adonna Khare, by Carrie Ann Baade, by Jeff Lemire, by Junji Ito, horror, creepy, dark, eldritch, fantasy`,
