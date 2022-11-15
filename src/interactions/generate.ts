@@ -1,16 +1,18 @@
 import {
+    ActionRowBuilder,
     AttachmentBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     CommandInteraction,
     SlashCommandBuilder,
 } from "discord.js";
 
-import IUserDocument from "../types/IUserDocument.js";
 import { imageJoin } from "../util/imageJoin.js";
-import { Model } from "mongoose";
 
 import hordeGenerate from "../util/hordeGenerate.js";
 import config from "../config.js";
 import sharp from "sharp";
+import Models from "../types/models.js";
 
 const styles: Record<string, (s: string) => string> = {
     raw: (p) => p,
@@ -119,7 +121,7 @@ export default {
 
     async commandHandler(
         interaction: CommandInteraction,
-        User: Model<IUserDocument>
+        { User, Generation }: Models
     ) {
         await interaction.deferReply();
 
@@ -226,54 +228,84 @@ export default {
 
         const buff: Buffer[] = data.map((d: any) => Buffer.from(d, "base64"));
 
-        let image = await imageJoin(buff);
+        try {
+            let image = await imageJoin(buff);
 
-        const sharpImage = sharp(image);
+            const sharpImage = sharp(image);
 
-        const maxSize = 8000000;
+            const maxSize = 8000000;
 
-        if (image.length > maxSize) {
-            const { height, width } = await sharpImage.metadata();
+            if (image.length > maxSize) {
+                const { height, width } = await sharpImage.metadata();
 
-            if (height && width) {
-                const newHeight = Math.floor(
-                    (height * (maxSize * 0.8)) / image.length
-                );
-                const newWidth = Math.floor(
-                    (width * (maxSize * 0.8)) / image.length
-                );
+                if (height && width) {
+                    const newHeight = Math.floor(
+                        (height * (maxSize * 0.8)) / image.length
+                    );
+                    const newWidth = Math.floor(
+                        (width * (maxSize * 0.8)) / image.length
+                    );
 
-                sharpImage.resize(newWidth, newHeight);
+                    sharpImage.resize(newWidth, newHeight);
+                }
             }
-        }
 
-        image = await sharpImage.toBuffer();
+            image = await sharpImage.toBuffer();
 
-        const messageData = {
-            files: [new AttachmentBuilder(image).setName(`generation.png`)],
-            embeds: [
-                {
-                    title:
-                        prompt.length > 200
-                            ? prompt.slice(0, 200) + "..."
-                            : prompt,
-                    fields:
-                        iterations === 1
-                            ? [
-                                  {
-                                      name: "Seed",
-                                      value: `${seed}`,
-                                      inline: true,
-                                  },
-                              ]
-                            : undefined,
-                    image: {
-                        url: `attachment://generation.png`,
+            const displayEventButton =
+                config.event.enabled &&
+                config.event.guildId === interaction.guildId;
+
+            const message = await interaction.editReply({
+                files: [new AttachmentBuilder(image).setName(`generation.png`)],
+                embeds: [
+                    {
+                        title:
+                            prompt.length > 200
+                                ? prompt.slice(0, 200) + "..."
+                                : prompt,
+                        fields:
+                            iterations === 1
+                                ? [
+                                      {
+                                          name: "Seed",
+                                          value: `${seed}`,
+                                          inline: true,
+                                      },
+                                  ]
+                                : undefined,
+                        image: {
+                            url: `attachment://generation.png`,
+                        },
                     },
-                },
-            ],
-        };
+                ],
+                components: displayEventButton
+                    ? [
+                          new ActionRowBuilder<ButtonBuilder>().addComponents(
+                              new ButtonBuilder()
+                                  .setCustomId("event")
+                                  .setEmoji("🎟️")
+                                  .setLabel("Submit to Event")
+                                  .setStyle(ButtonStyle.Primary)
+                          ),
+                      ]
+                    : undefined,
+            });
 
-        await interaction.editReply(messageData);
+            const generation = new Generation({
+                _id: message.id,
+                author: interaction.user.id,
+                prompt,
+                style,
+            });
+
+            await generation.save();
+        } catch (err) {
+            console.error(err);
+
+            await interaction.editReply(
+                "An error occurred while generating the image. Please try again later."
+            );
+        }
     },
 };
